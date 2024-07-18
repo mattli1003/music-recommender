@@ -6,6 +6,11 @@ from spotipy.oauth2 import SpotifyClientCredentials
 CLIENT_ID = "70696b3eac40462aaab33de92be1c606"
 CLIENT_SECRET = "4195eaf9ff6c407bba13fcb5e7d638f5"
 
+# initializing the spotify client
+client_credentials_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+# streamlit ui configurations
 st.set_page_config(layout="wide")
 
 st.header('Music Recommender System')
@@ -39,17 +44,15 @@ if category == 'More Songs Like This' or category == 'Songs With Similar BPM':
     with col1:
         outputs = st.text_input("Number of recommendations")
 
-# initializing the spotify client
-client_credentials_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
+# function that pulls album covers
 def get_song_album_cover_url(track):
     if track and track["album"]["images"]:
         album_cover_url = track["album"]["images"][0]["url"]
         return album_cover_url
     else:
         return "https://i.postimg.cc/0QNxYz4V/social.png"
-  
+
+# function that retrieves recommendations
 def get_recommendations(track_id=None, artist_id=None, target_bpm=None, outputs=None):
     seed_tracks = [track_id] if track_id else None
     seed_artists = [artist_id] if artist_id else None
@@ -93,6 +96,7 @@ def get_recommendations(track_id=None, artist_id=None, target_bpm=None, outputs=
 
     return recommended_music_names, recommended_artist_names, recommended_music_posters, recommended_music_previews
 
+# function that pulls top 10 artist tracks 
 def get_artist_top_tracks(artist_id):
     results = sp.artist_top_tracks(artist_id)
     top_tracks = results['tracks'][:10]
@@ -115,6 +119,7 @@ def get_artist_top_tracks(artist_id):
     
     return top_track_names, top_artist_names, top_track_posters, top_track_previews
 
+# what happens once "show recommendation" is clicked on the ui 
 if st.button('Show Recommendation'):
     if category == 'Choose a Category':
          st.write("Please select a category")
